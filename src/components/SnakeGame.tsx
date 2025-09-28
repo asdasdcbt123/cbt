@@ -34,6 +34,22 @@ const SnakeGame: React.FC = () => {
   const directionRef = useRef<Direction>(direction);
   const gameStatusRef = useRef<GameStatus>(gameStatus);
   
+  // Generate food at random position
+  const generateFood = useCallback((snakeBody: Position[]) => {
+    const isPositionOccupied = (pos: Position) => snakeBody.some(segment => segment.x === pos.x && segment.y === pos.y);
+    
+    let newFood: Position;
+    do {
+      newFood = {
+        x: Math.floor(Math.random() * BOARD_SIZE),
+        y: Math.floor(Math.random() * BOARD_SIZE),
+      };
+      // Make sure food doesn't appear on snake
+    } while (isPositionOccupied(newFood));
+    
+    setFood(newFood);
+  }, []);
+
   // Initialize game
   const initGame = useCallback(() => {
     setSnake(INITIAL_SNAKE);
@@ -44,21 +60,7 @@ const SnakeGame: React.FC = () => {
     generateFood(INITIAL_SNAKE);
     setGameStatus('PLAYING');
     gameStatusRef.current = 'PLAYING';
-  }, []);
-
-  // Generate food at random position
-  const generateFood = useCallback((snakeBody: Position[]) => {
-    let newFood: Position;
-    do {
-      newFood = {
-        x: Math.floor(Math.random() * BOARD_SIZE),
-        y: Math.floor(Math.random() * BOARD_SIZE),
-      };
-      // Make sure food doesn't appear on snake
-    } while (snakeBody.some(segment => segment.x === newFood.x && segment.y === newFood.y));
-    
-    setFood(newFood);
-  }, []);
+  }, [generateFood]);
 
   // Handle keyboard input
   useEffect(() => {
